@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
+
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -41,7 +41,8 @@ class MainActivity : AppCompatActivity() {
 
     }
     fun operationAction(view: View){
-        if (view is Button && canAddOperation) {
+        if (view is Button && canAddOperation)
+        {
             workingDisplay.append(view.text)
             canAddOperation = false
             canAddDecimal=true
@@ -50,6 +51,8 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+
     fun allClearAction(view: View){
        workingDisplay.text=""
         resultDisplay.text=""
@@ -58,6 +61,13 @@ class MainActivity : AppCompatActivity() {
       resultDisplay.text =calculateResults()
     }
 
+    fun backSpaceAction (view: View) {
+        val length = workingDisplay.length()
+        if (length > 0)
+            workingDisplay.text = workingDisplay.text.subSequence(0, length - 1)
+
+
+    }
     private fun calculateResults(): String {
         val digitsOperators = digitsOperators()
         if (digitsOperators.isEmpty())
@@ -70,9 +80,35 @@ class MainActivity : AppCompatActivity() {
         val result = addSubCalculate(timesDivision)
         return result.toString()
     }
+    //Stores the WorkingDisplay Data in an array
+    private fun digitsOperators(): MutableList<Any> {
+        val list = mutableListOf<Any>()
+        var currentDigit = ""
+        for (character in workingDisplay.text)
+        {
+            if (character.isDigit() || character == '.')
+            {
+                currentDigit += character
+            }
+            else
+            {
+                list.add(currentDigit.toFloat())
+                currentDigit = ""
+                list.add(character)
+            }
+        }
+
+        if (currentDigit != "")
+            list.add(currentDigit.toFloat())
+
+        return list
+
+    }
+
+    }
 
     private fun addSubCalculate(passedList: MutableList<Any>): Float {
-        var result =passedList[0] as Float
+        var result = passedList[0] as Float
         for (i in passedList.indices)
         {
               if (passedList[i] is Char && i!=passedList.lastIndex)
@@ -96,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         var list =passedList
         while (list.contains('x') || list.contains('/'))
         {
-            list=calcTimesDiv(list)
+            list = calcTimesDiv(list)
 
         }
         return list
@@ -107,8 +143,10 @@ class MainActivity : AppCompatActivity() {
         val newList = mutableListOf<Any>()
         var restartIndex = passedList.size
 
-        for (i in passedList.indices) {
-            if (passedList[i] is Char && i != passedList.lastIndex && i < restartIndex) {
+        for (i in passedList.indices)
+        {
+            if (passedList[i] is Char && i != passedList.lastIndex && i < restartIndex)
+            {
                 val operator = passedList[i]
                 val prevDigit = passedList[i - 1] as Float
                 val nextDigit = passedList[i + 1] as Float
@@ -126,46 +164,22 @@ class MainActivity : AppCompatActivity() {
                         newList.add(operator)
                     }
                 }
-                if (i > restartIndex)
-                    newList.add(passedList[i])
+
+            }
+            if (i > restartIndex)
+            {
+                newList.add(passedList[i])
             }
 
 
-            return newList
-        }
-
-        //Stores the WorkingDisplay Data in an array
-        private fun digitsOperators(): MutableList<Any> {
-
-            val list = mutableListOf<Any>()
-            var currentDigit = ""
-            for (character in workingDisplay.text) {
-                if (character.isDigit() || character == '.') {
-                    currentDigit += character
-                } else {
-                    list.add(currentDigit.toFloat())
-                    currentDigit = ""
-                    list.add(character)
-                }
-
-            }
-
-            if (currentDigit != "")
-                list.add(currentDigit.toFloat())
-
-            return list
-
         }
 
 
-        fun backSpaceAction (view: View) :
-        {
-            val length = workingDisplay.length()
-            if (length > 0)
-                workingDisplay.text = workingDisplay.text.subSequence(0, length - 1)
+        return newList
 
-          
-        }
+    }
+
+
 
 
 
